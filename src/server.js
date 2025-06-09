@@ -5,19 +5,31 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.js'; 
+
 import authRoutes from './routes/auth.routes.js';
 import patientRoutes from './routes/patientRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js'; 
 import verifyToken from './middlewares/verifyToken.js';
+import patientFilesRoutes from './routes/patientFiles.routes.js'; // <--- AQUÍ sí importa
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+// Swagger docs
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Rutas públicas
 app.use('/api/auth', authRoutes);
 
 // Rutas protegidas (todas las de pacientes requieren autenticación)
 app.use('/api/patients', verifyToken, patientRoutes);
+app.use('/api/patients', verifyToken, patientFilesRoutes); // <--- AQUÍ, después de declarar app
+
+// Subida de archivos (protegida)
+app.use('/api/upload', verifyToken, uploadRoutes);
 
 app.get('/', (req, res) => {
   res.send('API de Medisur funcionando ✅');
