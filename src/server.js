@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config(); // ¡esto siempre va al inicio!
+dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
@@ -7,20 +7,18 @@ import mongoose from 'mongoose';
 
 import authRoutes from './routes/auth.routes.js';
 import patientRoutes from './routes/patientRoutes.js';
-import verifyToken from './middlewares/verifyToken.js'; // 👈 Importarlo arriba
+import verifyToken from './middlewares/verifyToken.js';
 
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 
 // Rutas públicas
 app.use('/api/auth', authRoutes);
 
-// Rutas protegidas
-app.use('/api/patients', verifyToken, patientRoutes); // 👈 Aquí aplicas el middleware
+// Rutas protegidas (todas las de pacientes requieren autenticación)
+app.use('/api/patients', verifyToken, patientRoutes);
 
-// Ruta de prueba
 app.get('/', (req, res) => {
   res.send('API de Medisur funcionando ✅');
 });
@@ -42,7 +40,6 @@ mongoose.connect(uri, {
   process.exit(1);
 });
 
-// Iniciar el servidor
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);

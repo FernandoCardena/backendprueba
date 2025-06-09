@@ -1,57 +1,62 @@
-import express from 'express';
-import Patient from '../models/Patient.js';
+import express from "express";
+import Patient from "../models/Patient.js";
+import verifyToken from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
-// Create
-router.post('/', async (req, res) => {
+// Crear paciente
+router.post("/", verifyToken, async (req, res) => {
   try {
-    const patient = new Patient(req.body);
-    const saved = await patient.save();
-    res.status(201).json(saved);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const { nombres, apellidos, cedula, telefono, email } = req.body;
+    const user = req.userId;
+
+    // Evitar duplicados para este usuario
+    const pacienteExistente = await Patient.findOne({ cedula, user });
+    if (pacienteExistente) {
+      return res.status(400).json({ message: "Ese paciente ya existe para este usuario." });
+    }
+
+    const nuevoPaciente = new Patient({ nombres, apellidos, cedula, telefono, email, user });
+    await nuevoPaciente.save();
+    res.status(201).json(nuevoPaciente);
+  } catch (error) {
+    res.status(500).json({ message: "Error al crear paciente.", error: error.message });
   }
 });
 
-// Read all
-router.get('/', async (req, res) => {
+// Listar pacientes del usuario autenticado
+router.get("/", verifyToken, async (req, res) => {
   try {
-    const patients = await Patient.find();
-    res.json(patients);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const pacientes = await Patient.find({ user: req.userId });
+    res.json(pacientes);
+  } catch (error) {
+    res.status(500).json({ message: "Error al obtener pacientes.", error: error.message });
   }
 });
 
-// Read by ID
-router.get('/:id', async (req, res) => {
+// Editar paciente
+router.put("/:id", verifyToken, async (req, res) => {
   try {
-    const patient = await Patient.findById(req.params.id);
-    if (!patient) return res.status(404).json({ error: 'No encontrado' });
-    res.json(patient);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const paciente = await Patient.findOneAndUpdate(
+      { _id: req.params.id, user: req.userId },
+      req.body,
+      { new: true }
+    );
+    if (!paciente) return res.status(404).json({ message: "Paciente no encontrado." });
+    res.json(paciente);
+  } catch (error) {
+    res.status(500).json({ message: "Error al actualizar paciente.", error: error.message });
   }
 });
 
-// Update
-router.put('/:id', async (req, res) => {
+// Borrar paciente
+router.delete("/:id", verifyToken, async (req, res) => {
   try {
-    const updated = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Delete
-router.delete('/:id', async (req, res) => {
-  try {
-    await Patient.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Eliminado correctamente' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const deleted = await Patient.findOneAndDelete({ _id: req.params.id, user: req.userId });
+    if (!deleted) return res.status(404).json({ message: "Paciente no encontrado." });
+    res.json({ message: "Paciente eliminado." });
+  } catch (error) {
+    res.status(500).json({ message: "Error al eliminar paciente.", error: error.message });
   }
 });
 

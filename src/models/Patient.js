@@ -1,12 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const patientSchema = new mongoose.Schema({
-  nombre: { type: String, required: true },
-  edad: { type: Number, required: true },
-  dni: { type: String, required: true },
-  direccion: String,
-  telefono: String,
+  nombres: { type: String, required: true },
+  apellidos: { type: String, required: true },
+  cedula: { type: String, required: true },
+  telefono: { type: String, required: true },
+  email: { type: String, required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
 });
 
-const Patient = mongoose.model('Patient', patientSchema);
-export default Patient;
+export default mongoose.model("Patient", patientSchema);
