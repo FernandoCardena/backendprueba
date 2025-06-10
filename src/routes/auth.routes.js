@@ -42,7 +42,14 @@ router.post('/register', async (req, res) => {
     const user = new User({ email, password: hashedPassword });
     await user.save();
 
-    res.status(201).json({ message: 'Usuario registrado correctamente' });
+    // Ahora devolvemos también el _id y email del usuario
+    res.status(201).json({
+      message: 'Usuario registrado correctamente',
+      user: {
+        _id: user._id,
+        email: user.email
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
