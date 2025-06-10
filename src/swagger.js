@@ -9,7 +9,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "http://localhost:3001", // Cambia el puerto si usas otro
+      url: "http://localhost:3001",
       description: "Servidor local",
     },
   ],
@@ -31,7 +31,7 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ["./src/routes/*.js"], // Aquí Swagger busca las anotaciones en tus rutas
+  apis: ["./src/routes/*.js"], 
 };
 
 const swaggerSpec = swaggerJSDoc(options);

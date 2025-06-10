@@ -12,7 +12,7 @@ import authRoutes from './routes/auth.routes.js';
 import patientRoutes from './routes/patientRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js'; 
 import verifyToken from './middlewares/verifyToken.js';
-import patientFilesRoutes from './routes/patientFiles.routes.js'; // <--- AQUÍ sí importa
+import patientFilesRoutes from './routes/patientFiles.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -26,7 +26,7 @@ app.use('/api/auth', authRoutes);
 
 // Rutas protegidas (todas las de pacientes requieren autenticación)
 app.use('/api/patients', verifyToken, patientRoutes);
-app.use('/api/patients', verifyToken, patientFilesRoutes); // <--- AQUÍ, después de declarar app
+app.use('/api/patients', verifyToken, patientFilesRoutes); 
 
 // Subida de archivos (protegida)
 app.use('/api/upload', verifyToken, uploadRoutes);

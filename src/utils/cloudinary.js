@@ -12,7 +12,7 @@ cloudinary.config({
 export const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'medisur_uploads', // Puedes cambiar el nombre de la carpeta si quieres
+    folder: 'medisur_uploads',
     allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
     transformation: [{ width: 800, height: 800, crop: 'limit' }],
   },

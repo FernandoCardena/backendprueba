@@ -7,7 +7,7 @@ const patientSchema = new mongoose.Schema({
   telefono: { type: String, required: true },
   email: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  archivos: [{ type: String }] // ← NUEVO CAMPO
+  archivos: [{ type: String }]
 });
 
 export default mongoose.model("Patient", patientSchema);
